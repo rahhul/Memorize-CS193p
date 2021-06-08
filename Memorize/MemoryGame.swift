@@ -6,15 +6,18 @@
 // MODEL
 
 import Foundation
+import SwiftUI
 
 
 struct MemoryGame<CardContent: Equatable> {
     
     private(set) var cards: Array<Card>
     
+    private(set) var score: Int = 0
+    
     private var indexOfTheOneAndOnlyFaceUpCard: Int?
     
-    // Game Logic
+    /// Game Logic
     mutating func choose(_ card: Card) {
         if let chosenIndex = cards.firstIndex(where: { $0.id == card.id}),
            !cards[chosenIndex].isFaceUp,
@@ -24,6 +27,7 @@ struct MemoryGame<CardContent: Equatable> {
                 if cards[chosenIndex].content == cards[potentialMatchIndex].content {
                     cards[chosenIndex].isMatched = true
                     cards[potentialMatchIndex].isMatched = true
+                    score += 2
                 }
                 indexOfTheOneAndOnlyFaceUpCard = nil
             } else {
@@ -42,6 +46,7 @@ struct MemoryGame<CardContent: Equatable> {
     
     
     init(numberOfPairsOfCards: Int, createCardContent: (Int) -> CardContent) {
+        
         cards = Array<Card>()
         
         // add numberOfPairsOfCards X 2 cards to cards array
@@ -52,7 +57,10 @@ struct MemoryGame<CardContent: Equatable> {
             cards.append(Card(content: content, id: pairIndex*2))
             cards.append(Card(content: content, id: pairIndex*2 + 1))
         }
+        cards.shuffle()
     }
+    
+    
     
     struct Card: Identifiable {
         
@@ -64,7 +72,6 @@ struct MemoryGame<CardContent: Equatable> {
     }
     
 }
-
 
 
 

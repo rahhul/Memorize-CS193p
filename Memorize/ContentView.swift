@@ -14,21 +14,37 @@ struct ContentView: View {
     
     var body: some View {
         
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                ForEach(viewModel.cards) {
-                    
-                    card in CardView(card: card)
-                        .aspectRatio(2/3, contentMode: .fit)
-                        .onTapGesture {
-                            // intent
-                            viewModel.choose(card)
-                        }
+        VStack {
+            HStack {
+                Text("\(viewModel.theme.name)")
+                    .fontWeight(.semibold)
+                    .font(.title)
+                    .padding()
+                Spacer()
+                Text("Score: \(viewModel.score)")
+                    .font(.title2)
+                    .padding()
+            }
+            .padding(.horizontal)
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
+                    ForEach(viewModel.cards) {
+                        
+                        card in CardView(card: card)
+                            .aspectRatio(2/3, contentMode: .fit)
+                            .onTapGesture {
+                                // intent
+                                viewModel.choose(card)
+                            }
+                    }
                 }
             }
+            .foregroundColor(Color.blue)
+            .padding(.horizontal)
+            Button(action: {viewModel.newGame()}, label: {
+                Text("New Game").font(.title2)
+            })
         }
-        .foregroundColor(Color.blue)
-        .padding(.horizontal)
     }
 }
 
@@ -77,9 +93,9 @@ struct CardView: View {
             }
             // after a match, the pair will disappear
             else if card.isMatched {
-                    shape.opacity(0)
-                } else {
-                    shape.fill()
+                shape.opacity(0)
+            } else {
+                shape.fill()
             }
         }
     }
@@ -107,17 +123,12 @@ struct CardView: View {
 
 
 
-
-
-
-
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
         ContentView(viewModel: game)
             .preferredColorScheme(.light)
-        ContentView(viewModel: game)
-            .preferredColorScheme(.dark)
+        //        ContentView(viewModel: game)
+        //            .preferredColorScheme(.dark)
     }
 }
