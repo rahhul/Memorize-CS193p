@@ -11,12 +11,14 @@ import SwiftUI
 class EmojiMemoryGame: ObservableObject {
     typealias Card = MemoryGame<String>.Card
     
+    
     // Type Method
     static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
+        
         // get random emoji
         let randomEmoji = theme.emoji.shuffled()
         let numberOfPairs = min(theme.emoji.count, theme.numberOfPairs)
-        
+//        print(numberOfPairs)
         let memoryGame = MemoryGame<String>(numberOfPairsOfCards: numberOfPairs) {
             pairIndex in randomEmoji[pairIndex] }
         return memoryGame

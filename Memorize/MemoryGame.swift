@@ -17,7 +17,7 @@ struct MemoryGame<CardContent: Equatable> {
     
     private var indexOfTheOneAndOnlyFaceUpCard: Int? {
         
-        get { cards.indices.filter( {cards[$0].isFaceUp}).oneAndOnly } // functional programming
+        get { cards.indices.filter({cards[$0].isFaceUp}).oneAndOnly } // functional programming
         
         set { cards.indices.forEach({cards[$0].isFaceUp = ($0 == newValue)}) }
     }
@@ -36,12 +36,11 @@ struct MemoryGame<CardContent: Equatable> {
                     cards[potentialMatchIndex].isMatched = true
                     score += 2
                 }
-                cards[chosenIndex].isFaceUp = true
+                cards[chosenIndex].isFaceUp.toggle()
+//                score -= 1
             } else {
                 indexOfTheOneAndOnlyFaceUpCard = chosenIndex
             }
-            //            print("chosenCard = \(cards[chosenIndex])") // debug
-            cards[chosenIndex].isFaceUp.toggle()
         }
         //        print("\(cards)") // degug
     }
@@ -67,7 +66,7 @@ struct MemoryGame<CardContent: Equatable> {
     
     struct Card: Identifiable {
         
-        var isFaceUp: Bool = true
+        var isFaceUp: Bool = false
         var isMatched: Bool = false
         var content: CardContent
         var id: Int

@@ -27,53 +27,32 @@ struct EmojiMemoryGameView: View {
                 
             }
             .padding(.horizontal)
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(game.cards) {
-                        card in CardView(card: card)
-                            .aspectRatio(2/3, contentMode: .fit)
-                            .onTapGesture {
-                                // intent
-                                game.choose(card)
-                            }
+            
+            AspectVGrid(items: game.cards, aspectRatio: 2/3, content: { card in
+                if card.isMatched && !card.isFaceUp {
+                    Rectangle().opacity(0)
+                } else {
+                CardView(card: card)
+                    .padding(5)
+                    .onTapGesture {
+                        // intent
+                        game.choose(card)
                     }
                 }
-            }
-            .foregroundColor(Color.blue)
-            .padding(.horizontal)
+            })
+            
             Button(action: {game.newGame()}, label: {
                 Image(systemName: "arrow.counterclockwise.circle")
                 Text("New Game").font(.title2)
             })
         }
+        .foregroundColor(Color.blue)
+        .padding(.horizontal)
     }
 }
 
 
 
-func calcCardWidth(cardWidth: CGFloat, cardCount: Int,
-                   width: CGFloat, height: CGFloat, aspect: CGFloat = 2/3) -> CGFloat {
-    
-    let cardHeight = cardWidth / aspect
-    
-    if cardCount == 1 {
-        return cardWidth
-    }
-    
-    let colMax = Int(floor(width / cardWidth))
-    let rowMax = Int(floor(height / cardHeight))
-    let cardMax = colMax * rowMax
-    
-    if cardCount <= cardMax {
-        return cardWidth
-    }
-    
-    return calcCardWidth(cardWidth: width / CGFloat(colMax + 1),
-                         cardCount: cardCount,
-                         width: width,
-                         height: height,
-                         aspect: aspect)
-}
 
 
 
@@ -85,28 +64,37 @@ struct CardView: View {
     
     var body: some View {
         
-        ZStack {
-            let shape = RoundedRectangle(cornerRadius: 20.0)
-            if card.isFaceUp {
-                shape.fill().foregroundColor(.white)
-                shape.strokeBorder(lineWidth: 2.0)
-                Text(card.content).font(.largeTitle)
-            }
-            // after a match, the pair will disappear
-            else if card.isMatched {
-                shape.opacity(0)
-            } else {
-                shape.fill()
+        GeometryReader { geometry in
+            ZStack {
+                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
+                if card.isFaceUp {
+                    shape.fill().foregroundColor(.white)
+                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
+                    Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 100-90))
+                        .padding(6).opacity(0.4)
+                    Text(card.content).font(font(in: geometry.size))
+                }
+                // after a match, the pair will disappear
+                else if card.isMatched {
+                    shape.opacity(0)
+                } else {
+                    shape.fill()
+                }
             }
         }
     }
     
+    private func font(in size: CGSize) -> Font {
+        Font.system(size: min(size.width, size.height) * DrawingConstants.fontScale)
+    }
+    
+    private struct DrawingConstants {
+        static let cornerRadius: CGFloat = 10
+        static let lineWidth: CGFloat = 3.0
+        static let fontScale: CGFloat = 0.7
+    }
+    
 }
-
-
-
-
-
 
 
 
@@ -122,7 +110,8 @@ struct CardView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
-        EmojiMemoryGameView(game: game)
+        game.choose(game.cards.first!)
+        return EmojiMemoryGameView(game: game)
             .preferredColorScheme(.light)
         //        ContentView(game: game)
         //            .preferredColorScheme(.dark)
