@@ -32,7 +32,7 @@ struct EmojiMemoryGameView: View {
                 if card.isMatched && !card.isFaceUp {
                     Rectangle().opacity(0)
                 } else {
-                CardView(card: card)
+                    CardView(card: card)
                     .padding(5)
                     .onTapGesture {
                         // intent
@@ -57,7 +57,7 @@ struct EmojiMemoryGameView: View {
 
 
 
-
+// View for each card
 struct CardView: View {
     
     let card: EmojiMemoryGame.Card
@@ -66,31 +66,23 @@ struct CardView: View {
         
         GeometryReader { geometry in
             ZStack {
-                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-                if card.isFaceUp {
-                    shape.fill().foregroundColor(.white)
-                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
                     Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 100-90))
                         .padding(6).opacity(0.4)
-                    Text(card.content).font(font(in: geometry.size))
+                    Text(card.content)
+                        .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
+                        .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
+                        .font(.system(size: 32))
                 }
                 // after a match, the pair will disappear
-                else if card.isMatched {
-                    shape.opacity(0)
-                } else {
-                    shape.fill()
-                }
+            .cardify(isFaceUp: card.isFaceUp)
             }
         }
-    }
     
     private func font(in size: CGSize) -> Font {
         Font.system(size: min(size.width, size.height) * DrawingConstants.fontScale)
     }
     
     private struct DrawingConstants {
-        static let cornerRadius: CGFloat = 10
-        static let lineWidth: CGFloat = 3.0
         static let fontScale: CGFloat = 0.7
     }
     
